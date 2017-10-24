@@ -10,6 +10,7 @@ const {
   computed,
   computed: { alias, not },
   get,
+  getOwner,
   isArray,
   isNone,
   isPresent,
@@ -41,7 +42,13 @@ const pushValidatableObject = function(model, property) {
 };
 
 const lookupValidator = function(validatorName) {
-  let service = this.container.lookup('service:validations');
+  let owner = getOwner(this);
+
+  if (this.container) {
+    owner = this.container;
+  }
+
+  let service = owner.lookup('service:validations');
   let validators = [];
   let cache;
 
@@ -54,19 +61,19 @@ const lookupValidator = function(validatorName) {
   if (cache[validatorName]) {
     validators = validators.concat(cache[validatorName]);
   } else {
-    let local = this.container.factoryFor(`validator:local/${validatorName}`);
-    let remote = this.container.factoryFor(`validator:remote/${validatorName}`);
+    let local = owner.factoryFor(`validator:local/${validatorName}`);
+    let remote = owner.factoryFor(`validator:remote/${validatorName}`);
 
     if (local || remote) {
       validators = validators.concat([local, remote]);
     } else {
-      let base = this.container.factoryFor(`validator:${validatorName}`);
+      let base = owner.factoryFor(`validator:${validatorName}`);
 
       if (base) {
         validators = validators.concat([base]);
       } else {
-        local = this.container.factoryFor(`ember-validations@validator:local/${validatorName}`);
-        remote = this.container.factoryFor(`ember-validations@validator:remote/${validatorName}`);
+        local = owner.factoryFor(`ember-validations@validator:local/${validatorName}`);
+        remote = owner.factoryFor(`ember-validations@validator:remote/${validatorName}`);
 
         if (local || remote) {
           validators = validators.concat([local, remote]);
