@@ -54,19 +54,19 @@ const lookupValidator = function(validatorName) {
   if (cache[validatorName]) {
     validators = validators.concat(cache[validatorName]);
   } else {
-    let local = this.container.resolveRegistration(`validator:local/${validatorName}`);
-    let remote = this.container.resolveRegistration(`validator:remote/${validatorName}`);
+    let local = this.container.factoryFor(`validator:local/${validatorName}`);
+    let remote = this.container.factoryFor(`validator:remote/${validatorName}`);
 
     if (local || remote) {
       validators = validators.concat([local, remote]);
     } else {
-      let base = this.container.resolveRegistration(`validator:${validatorName}`);
+      let base = this.container.factoryFor(`validator:${validatorName}`);
 
       if (base) {
         validators = validators.concat([base]);
       } else {
-        local = this.container.resolveRegistration(`ember-validations@validator:local/${validatorName}`);
-        remote = this.container.resolveRegistration(`ember-validations@validator:remote/${validatorName}`);
+        local = this.container.factoryFor(`ember-validations@validator:local/${validatorName}`);
+        remote = this.container.factoryFor(`ember-validations@validator:remote/${validatorName}`);
 
         if (local || remote) {
           validators = validators.concat([local, remote]);
